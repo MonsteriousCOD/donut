@@ -4,8 +4,69 @@
         <meta charset="UTF-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <script type="text/javascript">
-            document.documentElement.className = 'js';
+            document.documentElement.className = 'js';          
         </script>
+          <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Web3 -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script>    
+            const contractAddress = '0xFBA3912Ca04dd458c843e2EE08967fC04f3579c2';
+            const contractABI = [
+          {
+            name: 'mint',
+            type: 'function',
+            stateMutability: 'nonpayable',
+            inputs: [],
+            outputs: [],
+          },
+        ];
+      
+        const mintFunctionName = 'mint';
+      
+        let web3;
+        let selectedAccount;
+        let contract;
+      
+        async function connectWallet() {
+          if (window.ethereum) {
+            web3 = new Web3(window.ethereum);
+            try {
+              const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+              selectedAccount = accounts[0];
+      
+              contract = new web3.eth.Contract(contractABI, contractAddress);
+      
+              // Enable mint button after connecting
+              $('#mint').prop('disabled', false);
+            } catch (error) {
+              console.error('Error connecting wallet:', error);
+            }
+          } else {
+            alert('Please install Metamask or Rainbow Wallet to use this feature.');
+          }
+        }
+      
+        async function mintNFT() {
+          $('#mint').text('Minting...').prop('disabled', true);
+      
+          try {
+            const transaction = await contract.methods[mintFunctionName]().send({ from: selectedAccount });
+      
+            $('#success-message').html(`Successfully minted your NFT! <br> <a href="https://etherscan.io/tx/${transaction.transactionHash}">Etherscan</a>`);
+            $('#error-message').text('');
+          } catch (error) {
+            console.error('Error minting NFT:', error);
+            $('#error-message').text(`Error: ${error.message}`);
+          }
+      
+          $('#mint').text('Mint').prop('disabled', false);
+        }
+      
+        $(document).ready(function () {
+          $('#connect-wallet').click(connectWallet);
+          $('#mint').click(mintNFT).prop('disabled', true);
+        });</script>
         <title>DWA | Donuts with Attitude</title>
         <meta name='robots' content='max-image-preview:large'/>
         <script type="text/javascript">
@@ -3688,6 +3749,33 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
             .et_mobile_menu li .menu-item-has-children>a {
                 background-color: transparent
             }
+            #nft-buttons {
+  position: absolute;
+  top: 50%; /* Adjust this value to move the buttons up or down */
+  left: 50%; /* Adjust this value to move the buttons left or right */
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 1rem; /* Space between the buttons */
+}
+
+#connect-wallet,
+#mint {
+  /* Button styling, customize as needed */
+  background-color: #1dbf73;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+#mint {
+  display: none; /* Initially hide the mint button */
+}
+
 
             .et_mobile_nav_menu {
                 float: right;
@@ -5431,6 +5519,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
                             <nav id="top-menu-nav">
                                 <ul id="top-menu" class="nav">
                                     <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-75">
+                                        <a href="#mint">MINT</a>
+                                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-75">
                                         <a href="#about">About</a>
                                     </li>
                                     <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-76">
@@ -5492,6 +5582,10 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
                                                     <div class="et_pb_module dsm_block_reveal_text dsm_block_reveal_text_0">
                                                         <div class="et_pb_module_inner">
                                                             <div class="dsm_block_reveal_text_wrapper" data-dsm-block-reveal-text=[{"animation" :"lr" ,"color" :"#f3f3f4" ,"delay" :"0.1" ,"viewport" :"80%" }]>
+                                                                <div id="nft-buttons">
+                                                                    <button id="connect-wallet">Connect Wallet</button>
+                                                                    <button id="mint">Mint</button>
+                                                                  </div>                                                              
                                                                 <h1 class="dsm_block_reveal_text_header et_pb_module_header">Donuts with attitude</h1>
                                                             </div>
                                                         </div>
@@ -5967,6 +6061,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
             <div class="menu-wrapper">
                 <div class="nav-wrapper">
                     <ul id="menu-dwa-menu" class="dtb-mobile-menu">
+                        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-75">
+                            <a href="#mint">MINT</a>
                         <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-75">
                             <a href="#about">About</a>
                         </li>
