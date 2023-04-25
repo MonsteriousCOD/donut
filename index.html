@@ -1,93 +1,70 @@
 <!DOCTYPE html>
 <html lang="en-US">
-    <head>
-        <meta charset="UTF-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <script type="text/javascript">
-            document.documentElement.className = 'js';          
-        </script>
-        <!-- Include jQuery -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- Include Web3 -->
-        <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
-        <!-- Include Web3Modal -->
-        <script src="node_modules/web3modal/dist/index.js"></script>
-        <!-- Include WalletConnect Provider -->
-        <script src="node_modules/@walletconnect/web3-provider/dist/cjs/index.js"></script>
-
-        <script>
-            const Web3Modal = window.Web3Modal.default;
-            const WalletConnectProvider = window.WalletConnectProvider.default;
-
-            const contractAddress = '0xFBA3912Ca04dd458c843e2EE08967fC04f3579c2';
-            const contractABI = [
-                {
-                    name: 'mint',
-                    type: 'function',
-                    stateMutability: 'nonpayable',
-                    inputs: [],
-                    outputs: [],
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script src="https://unpkg.com/web3modal@1.9.6/dist/web3modal.min.js"></script>
+    <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.3/dist/umd/index.min.js"></script>
+    <script>
+        const providerOptions = {
+            walletconnect: {
+                package: WalletConnectProvider,
+                options: {
+                    infuraId: 'your_infura_project_id', // Replace with your Infura project ID
                 },
-            ];
+            },
+        };
 
+        const web3Modal = new Web3Modal({
+            network: 'mainnet',
+            cacheProvider: true,
+            providerOptions,
+        });
+
+        let web3;
+        let selectedAccount;
+        let contract;
+
+        async function connectWallet() {
+            const provider = await web3Modal.connect();
+            web3 = new Web3(provider);
+
+            const accounts = await web3.eth.getAccounts();
+            selectedAccount = accounts[0];
+
+            // Replace with your contract ABI and address
+            const contractABI = [];
+            const contractAddress = '0xFBA3912Ca04dd458c843e2EE08967fC04f3579c2';
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+
+            // Enable mint button after connecting
+            $('#mint').prop('disabled', false);
+        }
+
+        async function mintNFT() {
+            // Replace with your mint function name and any required parameters
             const mintFunctionName = 'mint';
 
-            let web3;
-            let selectedAccount;
-            let contract;
+            try {
+                $('#mint').text('Minting...').prop('disabled', true);
+                const transaction = await contract.methods[mintFunctionName]().send({from: selectedAccount});
 
-            const providerOptions = {
-                walletconnect: {
-                    package: WalletConnectProvider,
-                    options: {
-                        infuraId: "YOUR_INFURA_PROJECT_ID", // Replace this with your own Infura Project ID
-                    },
-                },
-            };
-
-            const web3Modal = new Web3Modal({
-                cacheProvider: true,
-                providerOptions,
-            });
-
-            async function connectWallet() {
-                try {
-                    const provider = await web3Modal.connect();
-                    web3 = new Web3(provider);
-
-                    const accounts = await web3.eth.getAccounts();
-                    selectedAccount = accounts[0];
-
-                    contract = new web3.eth.Contract(contractABI, contractAddress);
-
-                    // Enable mint button after connecting
-                    $("#mint").prop("disabled", false);
-                } catch (error) {
-                    console.error("Error connecting wallet:", error);
-                    alert("Please install MetaMask or use a WalletConnect-compatible wallet to use this feature.");
-                }
+                $('#success-message').html(`Successfully minted your NFT! <br> <a href="https://etherscan.io/tx/${transaction.transactionHash}">Etherscan</a>`);
+                $('#error-message').text('');
+            } catch (error) {
+                console.error('Error minting NFT:', error);
+                $('#error-message').text(`Error: ${error.message}`);
             }
 
-            async function mintNFT() {
-                $("#mint").text("Minting...").prop("disabled", true);
+            $('#mint').text('Mint').prop('disabled', false);
+        }
 
-                try {
-                    const transaction = await contract.methods[mintFunctionName]().send({ from: selectedAccount });
-
-                    $("#success-message").html(`Successfully minted your NFT! <br> <a href="https://etherscan.io/tx/${transaction.transactionHash}">Etherscan</a>`);
-                    $("#error-message").text("");
-                } catch (error) {
-                    console.error("Error minting NFT:", error);
-                    $("#error-message").text(`Error: ${error.message}`);
-                }
-
-                $("#mint").text("Mint").prop("disabled", false);
-            }
-
-            $(document).ready(function () {
-                $("#connect-wallet").click(connectWallet);
-                $("#mint").click(mintNFT).prop("disabled", true);
-            });
+        $(document).ready(function () {
+            $('#connect-wallet').click(connectWallet);
+            $('#mint').click(mintNFT).prop('disabled', true);
+        });
         </script>
         <title>DWA | Donuts with Attitude</title>
         <meta name='robots' content='max-image-preview:large'/>
