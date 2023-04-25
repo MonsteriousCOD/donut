@@ -27,6 +27,16 @@
         let web3;
         let selectedAccount;
         let contract;
+        
+        async function checkNetwork() {
+          const networkId = await web3.eth.net.getId();
+          if (networkId !== parseInt(process.env.NEXT_PUBLIC_DEFAULT_CHAIN, 10)) {
+            alert('You are connected to the wrong network. Please switch to the correct network and try again.');
+          } else {
+            location.reload();
+          } 
+}
+
       
         async function connectWallet() {
           if (window.ethereum) {
@@ -3750,31 +3760,31 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
                 background-color: transparent
             }
             #nft-buttons {
-  position: absolute;
-  top: 50%; /* Adjust this value to move the buttons up or down */
-  left: 50%; /* Adjust this value to move the buttons left or right */
-  transform: translate(-50%, -50%);
-  display: flex;
-  gap: 1rem; /* Space between the buttons */
-}
+            position: absolute;
+            top: 50%; /* Adjust this value to move the buttons up or down */
+            left: 50%; /* Adjust this value to move the buttons left or right */
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 1rem; /* Space between the buttons */
+            }
 
-#connect-wallet,
-#mint {
-  /* Button styling, customize as needed */
-  background-color: #1dbf73;
-  color: #ffffff;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-weight: bold;
-  border-radius: 5px;
-}
+            #connect-wallet,
+            #mint {
+            /* Button styling, customize as needed */
+            background-color: #1dbf73;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            border-radius: 5px;
+            }
 
-#mint {
-  display: none; /* Initially hide the mint button */
-}
+           #mint {
+           display: none; /* Initially hide the mint button */
+            }
 
 
             .et_mobile_nav_menu {
@@ -5584,8 +5594,9 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
                                                             <div class="dsm_block_reveal_text_wrapper" data-dsm-block-reveal-text=[{"animation" :"lr" ,"color" :"#f3f3f4" ,"delay" :"0.1" ,"viewport" :"80%" }]>
                                                                 <div id="nft-buttons">
                                                                     <button id="connect-wallet">Connect Wallet</button>
-                                                                    <button id="mint">Mint</button>
-                                                                  </div>                                                              
+                                                                    <button id="mint" disabled>Mint</button>
+                                                                    <div id="success-message"></div>
+                                                                    <div id="error-message"></div>                                                                                                                                                                                                        </div>                                                              
                                                                 <h1 class="dsm_block_reveal_text_header et_pb_module_header">Donuts with attitude</h1>
                                                             </div>
                                                         </div>
